@@ -39,9 +39,17 @@ st.dataframe(df.describe())
 
 # --- 주요 변수 선택 ---
 st.sidebar.header("🔍 분석 옵션")
-score_col = st.sidebar.selectbox("행복 점수 컬럼 선택", [col for col in df.columns if "Score" in col or "score" in col or "Happiness" in col])
-x_axis = st.sidebar.selectbox("X축 변수 선택", [col for col in df.columns if col != score_col])
-y_axis = st.sidebar.selectbox("Y축 변수 선택", [col for col in df.columns if col != score_col and col != x_axis])
+score_col = st.sidebar.selectbox(
+    "행복 점수 컬럼 선택",
+    [col for col in df.columns if "Score" in col or "score" in col or "Happiness" in col],
+)
+
+x_axis = st.sidebar.selectbox(
+    "X축 변수 선택", [col for col in df.columns if col != score_col]
+)
+y_axis = st.sidebar.selectbox(
+    "Y축 변수 선택", [col for col in df.columns if col != score_col and col != x_axis]
+)
 
 # --- 시각화 1: 행복 점수 vs 선택 변수 ---
 st.subheader("💡 행복 점수와 주요 요인 간의 관계")
@@ -53,7 +61,7 @@ chart1 = (
         x=alt.X(x_axis, title=x_axis),
         y=alt.Y(score_col, title="행복 점수"),
         color=alt.Color(y_axis, scale=alt.Scale(scheme="blues"), title=y_axis),
-        tooltip=["Country name", score_col, x_axis, y_axis]
+        tooltip=["Country name", score_col, x_axis, y_axis],
     )
     .interactive()
     .properties(height=450)
@@ -72,7 +80,7 @@ chart2 = (
         y=alt.Y("Country name", sort="-x", title="국가"),
         x=alt.X(score_col, title="행복 점수"),
         color=alt.Color(score_col, scale=alt.Scale(scheme="tealblues")),
-        tooltip=["Country name", score_col]
+        tooltip=["Country name", score_col],
     )
     .properties(height=400)
 )
@@ -82,7 +90,12 @@ st.altair_chart(chart2, use_container_width=True)
 if "Regional indicator" in df.columns:
     st.subheader("🌍 대륙(지역)별 평균 행복 점수")
 
-    region_mean = df.groupby("Regional indicator")[score_col].mean().reset_index().sort_values(score_col, ascending=False)
+    region_mean = (
+        df.groupby("Regional indicator")[score_col]
+        .mean()
+        .reset_index()
+        .sort_values(score_col, ascending=False)
+    )
 
     chart3 = (
         alt.Chart(region_mean)
@@ -91,12 +104,10 @@ if "Regional indicator" in df.columns:
             x=alt.X(score_col, title="평균 행복 점수"),
             y=alt.Y("Regional indicator", sort="-x", title="지역"),
             color=alt.Color(score_col, scale=alt.Scale(scheme="greens")),
-            tooltip=["Regional indicator", score_col]
+            tooltip=["Regional indicator", score_col],
         )
         .properties(height=400)
     )
     st.altair_chart(chart3, use_container_width=True)
 
-st.caption("📘 데이터 출처: World Happiness Report (https://worldhappiness.report)")형별 비율 컬럼이 포함되어야 합니다.")
-else:
-    st.info("👆 CSV 파일을 업로드하면 분석이 시작됩니다.")
+st.caption("📘 데이터 출처: World Happiness Report (https://worldhappiness.report)")
