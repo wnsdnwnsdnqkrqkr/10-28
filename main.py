@@ -10,24 +10,22 @@ st.markdown("""
 각국의 행복 점수와 사회적 요인(GDP, 자유, 기대수명 등)을 시각적으로 분석합니다.
 """)
 
-# --- 데이터 업로드 or 샘플 데이터 사용 ---
+# --- 데이터 업로드 ---
 st.sidebar.header("📂 데이터 업로드")
 uploaded_file = st.sidebar.file_uploader("CSV 파일을 업로드하세요 (World Happiness Report 형식)", type=["csv"])
 
 @st.cache_data
 def load_data(file):
     df = pd.read_csv(file)
-    df.columns = df.columns.str.strip()  # 공백 제거
+    df.columns = df.columns.str.strip()
     return df
 
 if uploaded_file is not None:
     df = load_data(uploaded_file)
+    st.success("✅ 데이터 업로드 완료!")
 else:
-    # 예시 데이터 (2023 World Happiness Report 일부 발췌)
-    url = "https://raw.githubusercontent.com/datasets/world-happiness-report/master/data/2023.csv"
-    df = pd.read_csv(url)
-
-st.success("✅ 데이터 불러오기 완료!")
+    st.warning("⚠️ CSV 파일을 업로드해주세요. (World Happiness Report 형식)")
+    st.stop()
 
 # --- 데이터 확인 ---
 st.subheader("데이터 미리보기")
@@ -44,12 +42,8 @@ score_col = st.sidebar.selectbox(
     [col for col in df.columns if "Score" in col or "score" in col or "Happiness" in col],
 )
 
-x_axis = st.sidebar.selectbox(
-    "X축 변수 선택", [col for col in df.columns if col != score_col]
-)
-y_axis = st.sidebar.selectbox(
-    "Y축 변수 선택", [col for col in df.columns if col != score_col and col != x_axis]
-)
+x_axis = st.sidebar.selectbox("X축 변수 선택", [col for col in df.columns if col != score_col])
+y_axis = st.sidebar.selectbox("Y축 변수 선택", [col for col in df.columns if col != score_col and col != x_axis])
 
 # --- 시각화 1: 행복 점수 vs 선택 변수 ---
 st.subheader("💡 행복 점수와 주요 요인 간의 관계")
